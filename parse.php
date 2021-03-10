@@ -23,7 +23,7 @@
         "EQ" => array("var", "symb", "symb"),
         "AND" => array("var", "symb", "symb"),
         "OR" => array("var", "symb", "symb"),
-        "NOT" => array("var", "symb", "symb"),
+        "NOT" => array("var", "symb"),
         "INT2CHAR" => array("var", "symb"),
         "STRI2INT" => array("var", "symb", "symb"),
         "READ" => array("var", "type"),
@@ -40,7 +40,6 @@
         "EXIT" => array("symb"),
         "DPRINT" => array("symb"),
         "BREAK" => array(),
-
     );
 
     function read_line() {
@@ -77,13 +76,18 @@
                 exit(other);
             }
             return "label";
+        }else if ($argument == "type"){
+            if (!preg_match("~^(int|string|bool)$~", $word)){
+                exit(other);
+            }
+            return "type";
         }else if ($argument == "symb"){
             $match = explode("@", $word, 2);
            
             if ($match[0] == "string"){
-            #    if (!preg_match("~^[a-zA-Z_\-$&%*][a-zA-Z0-9_\-$&%*]*$~", $match[1])) {
-            #        exit(other);
-            #    }
+                if (preg_match("~\s~", $match[1])) {
+                    exit(other);
+                }
                 return "string";
             }else if($match[0] == "int"){
                 if (!preg_match("~^[+-]?[0-9]+$~", $match[1])){
@@ -100,12 +104,17 @@
                     exit(other);
                 }
                 return "var";
-            }else return "nil";
-        }
+            }else if($match[0] == "nil"){
+                if (!preg_match("~^nil$~", $match[1])){
+                    exit(other);
+                }
+                return "nil";
+            } 
+        }else exit(other);
     }
 
     function convert_string($type, $line){
-        if (preg_match("~^(string|bool|int)~", $type)){
+        if (preg_match("~^(string|bool|int|nil)~", $type)){
             $string = explode("@", $line, 2);
             return $string[1];
         }else return $line;
@@ -122,10 +131,11 @@
         $xmlRoot = $domtree->appendChild($xmlRoot);
 
         while ($line = read_line()){
+            $line[0] = strtoupper($line[0]);
             $foo = array_key_exists($line[0], $instructions);
 
             if(!$foo){
-                exit(other);
+                exit(wrongOpcode);
             }
             $instruction = $instructions[$line[0]];
           
