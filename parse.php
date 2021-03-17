@@ -1,4 +1,9 @@
 <?php
+    /*
+        IPP project 2021
+        parse.php
+        Author: Karel Norek, xnorek01
+    */
     const badParam = 10;
     const badHeader = 21;
     const wrongOpcode = 22;
@@ -42,6 +47,7 @@
         "BREAK" => array(),
     );
 
+    # Read lines and skip empty lines or lines with only comments
     function read_line() {
         $STDIN = STDIN;
         while(true) {
@@ -65,14 +71,16 @@
         return $words;
     }
 
+    # Check arguments of instructions with regular expressions
     function arg_check($word, $argument){
         if ($argument == "var"){
-            if (!preg_match("~^(LF|TF|GF)@[a-zA-Z_\-$&%*][a-zA-Z0-9_\-$&%*]*$~", $word)){
+            
+            if (!preg_match("~^(LF|TF|GF)@[a-zA-Z_\-$&%!?*][a-zA-Z0-9_\-$&%!?*]*$~", $word)){
                 exit(other);
             }
             return "var";
         }else if ($argument == "label"){
-            if (!preg_match( "~^[a-zA-Z_\-$&%*][a-zA-Z0-9_\-$&%*]*$~", $word)) {
+            if (!preg_match( "~^[a-zA-Z_\-$&%!?*][a-zA-Z0-9_\-$&%!?*]*$~", $word)) {
                 exit(other);
             }
             return "label";
@@ -87,6 +95,13 @@
             if ($match[0] == "string"){
                 if (preg_match("~\s~", $match[1])) {
                     exit(other);
+                }if (preg_match("~\\\\~", $match[1])){
+                    $test_slash= explode("\\", $match[1]);
+                    for ($i = 1; $i <= count($test_slash); $i++){
+                        if (!preg_match("~^[0-9]{3,}~", $test_slash[1])){
+                            exit(other);
+                        }
+                    }
                 }
                 return "string";
             }else if($match[0] == "int"){
@@ -109,10 +124,11 @@
                     exit(other);
                 }
                 return "nil";
-            } 
+            }else exit(other);
         }else exit(other);
     }
 
+    # Split symbol into 2 string for easier work with XML
     function convert_string($type, $line){
         if (preg_match("~^(string|bool|int|nil)~", $type)){
             $string = explode("@", $line, 2);
@@ -120,6 +136,7 @@
         }else return $line;
     }
 
+    # Check if instruction is correct and write it into XML
     function parse_instruction(){
         global $instructions;
         $counter = 0;
@@ -151,64 +168,46 @@
             if (count($instruction) == 1){
                 
                 $type = arg_check($line[1], $instruction[0]);
-                $line[1] = convert_string($type, $line[1]);
+                $line[1] = convert_string($type, htmlspecialchars($line[1]));
                 $xmlArg1 = $domtree->createElement("arg1", $line[1]);
                 $xmlArg1->setAttribute("type", $type);
                 $xmlInstruction->appendChild($xmlArg1);
             }
 
             if (count($instruction) == 2){
-                $type1 = arg_check($line[1], $instruction[0]);
-                $line[1] = convert_string($type1, $line[1]);
-                $xmlArg1 = $domtree->createElement("arg1", $line[1]);
-                $xmlArg1->setAttribute("type", $type1);
-                
-                
-                $type2 = arg_check($line[2], $instruction[1]);
-                $line[2] = convert_string($type2, $line[2]);
-                $xmlArg2 = $domtree->createElement("arg2", $line[2]);
-                $xmlArg2->setAttribute("type", $type2);
-
-                $xmlInstruction->appendChild($xmlArg1);
-                $xmlInstruction->appendChild($xmlArg2);
+                for ($i = 1; $i <= 2; $i++) {
+                    $type = arg_check($line[$i], $instruction[$i-1]);
+                    $line[$i] = convert_string($type, $line[$i]);
+                    $xmlArg = $domtree->createElement("arg{$i}", htmlspecialchars($line[$i]));
+                    $xmlArg->setAttribute("type", $type);
+                    $xmlInstruction->appendChild($xmlArg);
+                }
             }
-
             if (count($instruction) == 3){
-                $type1 = arg_check($line[1], $instruction[0]);
-                $line[1] = convert_string($type1, $line[1]);
-                $xmlArg1 = $domtree->createElement("arg1", $line[1]);
-                $xmlArg1->setAttribute("type", $type1);
-                
-                $type2 = arg_check($line[2], $instruction[1]);
-                $line[2] = convert_string($type2, $line[2]);
-                $xmlArg2 = $domtree->createElement("arg2", $line[2]);
-                $xmlArg2->setAttribute("type", $type2);
-
-                $type3 = arg_check($line[3], $instruction[2]);
-                $line[3] = convert_string($type3, $line[3]);
-                $xmlArg3 = $domtree->createElement("arg2", $line[3]);
-                $xmlArg3->setAttribute("type", $type3);
-
-                $xmlInstruction->appendChild($xmlArg1);
-                $xmlInstruction->appendChild($xmlArg2);
-                $xmlInstruction->appendChild($xmlArg3);
+                for ($i = 1; $i <= 3; $i++) {
+                    $type = arg_check($line[$i], $instruction[$i-1]);
+                    $line[$i] = convert_string($type, $line[$i]);
+                    $xmlArg = $domtree->createElement("arg{$i}", htmlspecialchars($line[$i]));
+                    $xmlArg->setAttribute("type", $type);
+                    $xmlInstruction->appendChild($xmlArg);
+                }
             }
-
-
             $xmlRoot->appendChild($xmlInstruction);
         }
-
         echo $domtree->saveXML();
     }
 
+    # Argument check
     if ($argc > 1) {
         if ($argv[1] == "--help" && $argc == 2) {
-            echo "help\n";
+            echo "Parser that parses\nUsage: No arguments or --help: prints this help\nScript takes stdin as input and stdout as output\n";
+            exit(0);
         }else{ 
             exit(badParam);
         }
     }
 
+    # Check if input contains correct header
     $line = read_line();
     if(!preg_match("~^\.ippcode21$~i", $line[0])) {
         exit(badHeader);
