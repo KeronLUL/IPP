@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import re
+from core import Interpret
 
 class Instruction:
     def __init__(self, opcode, arg1=None, arg2=None, arg3=None):
@@ -69,9 +70,9 @@ class XMLParser:
             exit(32)
         if not re.match('^ippcode21$', self.root.attrib['language'], re.IGNORECASE):
             exit(32)
-
         order = []
         instList = {}
+        labels = {}
         for inst in self.root:
             if inst.tag != 'instruction':
                 exit(32)  
@@ -95,7 +96,6 @@ class XMLParser:
                 number = int(arg.tag.split("arg")[1])
                 if not re.match('^arg[1-3]{1}{\'type\':\s\'(var|int|bool|string|label|type|nil)\'}', string):
                     exit(32)
-
                 if args == 0:
                     if arg:
                         exit(32)
@@ -114,15 +114,21 @@ class XMLParser:
             elif args == 1:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0])
                 instList[int(inst.attrib['order'])] = instruction
+                if inst.attrib['opcode'] == 'LABEL':
+                    label = inst[0].text
+                    if label in labels:
+                        exit(52)
+                    labels[label] = inst.attrib['order']
             elif args == 2:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0], arg2=inst[1])
                 instList[int(inst.attrib['order'])] = instruction
             elif args == 3:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0], arg2=inst[1], arg3=inst[2])
                 instList[int(inst.attrib['order'])] = instruction
-        #duplicitni order
+        if len(order) != len(set(order)):
+            exit(32)
         instList = sorted(instList.items(), key=lambda x: x[0])
-        return instList       
+        return instList, labels     
 
     def checkArg(self, argType, arg):
         if argType == 'type':
@@ -147,7 +153,7 @@ class XMLParser:
             elif arg.attrib['type'] == 'var':
                 self.checkArg('var', arg)
             elif arg.attrib['type'] == 'string':
-                #pridat kontrolu stringu
+                
                 if arg.text != None:
                     arg.text = re.sub(r'\\([0-9]{3})', lambda x: chr(int(x[1])), arg.text) 
         else: exit(32)

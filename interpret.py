@@ -1,8 +1,8 @@
 import argparse
 import sys
-import re
 from xmlParser import XMLParser
 from frames import Frames
+from core import Interpret
 
 def argument_parser():
     parser = argparse.ArgumentParser()
@@ -22,22 +22,21 @@ def argument_parser():
 
     return inputFile, sourceFile
 
-
 def main():
-    inputFile, sourceFile = argument_parser()
-    xml = XMLParser(sourceFile)
-    instList = xml.checkXML()
-    globalframe = {}
-    for x in range(len(instList)):
-        if instList[x][1][0] == 'DEFVAR':
-            name = instList[x][1][1].split("@", 1)[1]
-            if name not in globalframe:
-                globalframe[x] = {name}
+    try:
+        inputFile, sourceFile = argument_parser()
+    except SystemExit:
+        exit(10)
 
-        if instList[x][1][0] == 'MOVE':
-            name = instList[x][1][1].split("@", 1)[1]
-            
-    print(globalframe)       
+    xml = XMLParser(sourceFile)
+    try:
+        instList, labels = xml.checkXML()
+    except IndexError:
+        exit(31)
+
+    interpret = Interpret(instList, labels)
+    interpret.run(inputFile)
+ 
 if __name__ == '__main__':
     main()
     
