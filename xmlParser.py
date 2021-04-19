@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import re
 import sys
 from core import Interpret
+from error import ErrorHandler
 
 # Class that stores whole instruction
 class Instruction:
@@ -58,50 +59,50 @@ class XMLParser:
             xml = ET.parse(xmlFile)
             self.root = xml.getroot()
         except FileNotFoundError:
-            sys.exit(31)
+            ErrorHandler.errorExit(31, "Invalid XML format")
         except ET.ParseError:
-            sys.exit(31)
+            ErrorHandler.errorExit(31, "Invalid XML format")
 
     # Check whole XML and insert instruction in order into sorted list
     def checkXML(self):
         if self.root.tag != 'program':
-            sys.exit(32)
+            ErrorHandler.errorExit(32, "Invalid XML structure")
         for atr in self.root.attrib:
             if atr not in ['language', 'name', 'description']:
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
         if 'language' not in self.root.attrib:
-            sys.exit(32)
+            ErrorHandler.errorExit(32, "Invalid XML structure")
         if not re.match('^ippcode21$', self.root.attrib['language'], re.IGNORECASE):
-            sys.exit(32)
+            ErrorHandler.errorExit(32, "Invalid XML structure")
         order = []
         instList = {}
         labels = {}
         for inst in self.root:
             if inst.tag != 'instruction':
-                sys.exit(32)  
+                ErrorHandler.errorExit(32, "Invalid XML structure") 
             if not('opcode' in inst.attrib and 'order' in inst.attrib):
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
             if inst.attrib['order'].isnumeric():
                 if int(inst.attrib['order']) <= 0:
-                    sys.exit(32)
-            else: sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
+            else: ErrorHandler.errorExit(32, "Invalid XML structure")
             order.append(inst.attrib['order'])
             inst.attrib['opcode'] = inst.attrib['opcode'].upper()
             if inst.attrib['opcode'] not in self.instructions:
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
             args = len(self.instructions[inst.attrib['opcode']])
             
             counter = 1
             for arg in inst:
                 if counter > args:
-                    sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
                 string = arg.tag + str(arg.attrib)
                 number = int(arg.tag.split("arg")[1])
                 if not re.match('^arg[1-3]{1}{\'type\':\s\'(var|int|bool|string|label|type|nil)\'}', string):
-                    sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
                 if args == 0:
                     if arg:
-                        sys.exit(32)
+                        ErrorHandler.errorExit(32, "Invalid XML structure")
                 elif args == 1:
                     self.checkArg(self.instructions[inst.attrib['opcode']][number-1], arg)
                 elif args == 2:
@@ -120,7 +121,7 @@ class XMLParser:
                 if inst.attrib['opcode'] == 'LABEL':
                     label = inst[0].text
                     if label in labels:
-                        sys.exit(52)
+                        ErrorHandler.errorExit(52, "Semantic Error")
                     labels[label] = inst.attrib['order']
             elif args == 2:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0], arg2=inst[1])
@@ -129,7 +130,7 @@ class XMLParser:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0], arg2=inst[1], arg3=inst[2])
                 instList[int(inst.attrib['order'])] = instruction
         if len(order) != len(set(order)):
-            sys.exit(32)
+            ErrorHandler.errorExit(32, "Invalid XML structure")
         instList = sorted(instList.items(), key=lambda x: x[0])
         return instList, labels     
 
@@ -137,32 +138,32 @@ class XMLParser:
     def checkArg(self, argType, arg):
         if argType == 'type':
             if not re.match('^(int|bool|string)$', arg.text):
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
         elif argType == 'var':
             if not re.match('^(LF|TF|GF)@[a-zA-Z_\-$&%!?*][a-zA-Z0-9_\-$&%!?*]*$', arg.text):
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
         elif argType == 'label':
             if not re.match('^[a-zA-Z_\-$&%!?*][a-zA-Z0-9_\-$&%!?*]*$', arg.text):
-                sys.exit(32)
+                ErrorHandler.errorExit(32, "Invalid XML structure")
         elif argType == 'symb':
             if arg.attrib['type'] == 'int':
                 if not re.match('^[+-]?[0-9]+$', arg.text):
-                    sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
             elif arg.attrib['type'] == 'bool':
                 if not re.match('^(true|false)$', arg.text):
-                    sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
             elif arg.attrib['type'] == 'nil':
                 if not re.match('^nil$', arg.text):
-                    sys.exit(32)
+                    ErrorHandler.errorExit(32, "Invalid XML structure")
             elif arg.attrib['type'] == 'var':
                 self.checkArg('var', arg)
             elif arg.attrib['type'] == 'string':
                 if arg.text != None:
                     if not re.match('^(([^\\\\])|(\\\\(?=\d{3})))*$', arg.text):
-                        sys.exit(32)
+                        ErrorHandler.errorExit(32, "Invalid XML structure")
                     try:
                         arg.text = re.sub(r'\\([0-9]{3})', lambda x: chr(int(x[1])), arg.text)
                     except ValueError:
-                        sys.exit(32)
-        else: sys.exit(32)
+                        ErrorHandler.errorExit(32, "Invalid XML structure")
+        else: ErrorHandler.errorExit(32, "Invalid XML structure")
         

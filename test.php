@@ -222,11 +222,11 @@
     $fileArray = [$jexamcfg, $jexamxml, $parsePath, $interpretPath];
     for ($i = 0; $i < 4; $i++){
         if (!file_exists($fileArray[$i])){
-            errorExit(11, "File doesn't exists\n");
+            errorExit(41, "File doesn't exists\n");
         }
     }
     if (!is_dir($testDir)){
-        errorExit(11, "Directory doesn't exists\n");
+        errorExit(41, "Directory doesn't exists\n");
     }
 
     # Find every test ending with .src

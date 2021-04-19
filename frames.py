@@ -1,5 +1,6 @@
 import re
 import sys
+from error import ErrorHandler
 
 class Frames:
     def __init__(self):
@@ -17,14 +18,14 @@ class Frames:
             frame, name = arg['value'].split('@', 1)
             frameSearch = self.getFrame(frame)
             if frameSearch == 'UNDEFINED':
-                sys.exit(55)
+                ErrorHandler.errorExit(55, "Invalid frame")
             if name in frameSearch:
                 if frameSearch[name]['value'] is None and frameSearch[name]['type'] is None and not self.type:
-                    sys.exit(56)
+                    ErrorHandler.errorExit(56, "Missing value")
                 value = frameSearch[name]['value']
                 type = frameSearch[name]['type']
                 return value, type
-            else: sys.exit(54)
+            else: ErrorHandler.errorExit(54, "Invalid variable")
         else: return arg['value'], arg['type']
 
     def getFrame(self, frame):
@@ -44,21 +45,21 @@ class Frames:
         frame, name = arg['value'].split('@', 1)
         frameInsert = self.getFrame(frame)
         if frameInsert == 'UNDEFINED':
-            sys.exit(55)
+            ErrorHandler.errorExit(55, "Invalid frame")
         if name in frameInsert:
             frameInsert[name]['value'] = value
             frameInsert[name]['type'] = type
         else: 
-            sys.exit(54)
+            ErrorHandler.errorExit(54, "Invalid variable")
     
     # Insert variable into given frame
     def defvar(self, arg):
         frame, name = arg['value'].split('@', 1)
         frameInsert = self.getFrame(frame)
         if frameInsert == 'UNDEFINED':
-            sys.exit(55)
+            ErrorHandler.errorExit(55, "Invalid frame")
         if name not in frameInsert:
             frameInsert[name] = {'type': None, 'value': None}
         else:
-            sys.exit(52)
+            ErrorHandler.errorExit(52, "Semantic Error")
             

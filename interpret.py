@@ -5,6 +5,7 @@ import sys
 from xmlParser import XMLParser
 from frames import Frames
 from core import Interpret
+from error import ErrorHandler
 
 # Argument check
 def argument_parser():
@@ -29,15 +30,15 @@ def main():
     try:
         inputFile, sourceFile = argument_parser()
     except SystemExit:
-        if sys.argv[1] == '--help':
+        if len(sys.argv) > 1 and sys.argv[1] == '--help':
             sys.exit(0)
-        else: sys.exit(10)
+        else: ErrorHandler.errorExit(10, "Invalid arguments")
 
     xml = XMLParser(sourceFile)
     try:
         instList, labels = xml.checkXML()
     except IndexError:
-        sys.exit(32)
+        ErrorHandler.errorExit(32, "Invalid XML structure")
 
     interpret = Interpret(instList, labels)
     interpret.run(inputFile)
