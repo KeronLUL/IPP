@@ -126,7 +126,8 @@ class Interpret:
                 print("Instruction order: " + str(self.instList[instruction][0]), file=sys.stderr)
                 print("Global frame: " + self.frames.globalFrame, file=sys.stderr)
                 print("Tmp frame: " + self.tmpFrame, file=sys.stderr)
-                print("Frame stack: " + self.frames.frameStack, file=sys.stderr)            elif self.instList[instruction][1].opcode == 'DEFVAR':
+                print("Frame stack: " + self.frames.frameStack, file=sys.stderr)            
+            elif self.instList[instruction][1].opcode == 'DEFVAR':
                 self.frames.defvar(self.instList[instruction][1].arg1)
             elif self.instList[instruction][1].opcode == 'MOVE':
                 value, type = self.frames.getValueAndType(self.instList[instruction][1].arg2)
@@ -135,18 +136,14 @@ class Interpret:
                 self.frames.setvar(self.instList[instruction][1].arg1, type, value)
             elif self.instList[instruction][1].opcode == 'WRITE':
                 value, type = self.frames.getValueAndType(self.instList[instruction][1].arg1)
-                if value is not None:
-                    if value == 'nil' and type != 'string':
-                        value = ''
-                    print(value, end='')
-                else: sys.exit(56)
+                if value is None or (value == 'nil' and type != 'string'):
+                    value = ''
+                print(value, end='')
             elif self.instList[instruction][1].opcode == 'DPRINT':
                 value, type = self.frames.getValueAndType(self.instList[instruction][1].arg1)
-                if value is not None:
-                    if value == 'nil':
-                        value = ''
-                    print(value, file=sys.stderr, end='')
-                else: sys.exit(56)
+                if value is None or (value == 'nil' and type != 'string'):
+                    value = ''
+                print(value, end='')   
             elif self.instList[instruction][1].opcode == 'EXIT':
                 value, type = self.frames.getValueAndType(self.instList[instruction][1].arg1)
                 if type != 'int':

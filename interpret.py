@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.8
+
 import argparse
 import sys
 from xmlParser import XMLParser
@@ -39,7 +41,8 @@ def main():
 
     interpret = Interpret(instList, labels)
     interpret.run(inputFile)
- 
+    sys.exit(0)
+
 if __name__ == '__main__':
     main()
     
