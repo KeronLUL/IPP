@@ -175,12 +175,12 @@
       
         # Choose which source file to give to interpret depending on set arguments
         if (!$intOnly){
-            exec("python3.8 " . $interpretPath . " --source=". $path . ".tmp" . " --input=" . $inFile, $intOut, $intRC);
-            $intOut = shell_exec("python3.8 " . $interpretPath . " --source=". $path . ".tmp" . " --input=" . $inFile);
+            exec("python3.8 " . $interpretPath . " --source=". $path . ".tmp" . " --input=" . $inFile . " 2>/dev/null", $intOut, $intRC);
+            $intOut = shell_exec("python3.8 " . $interpretPath . " --source=". $path . ".tmp" . " --input=" . $inFile . " 2>/dev/null");
             unlink($path .".tmp");
         }else {
-            exec("python3.8 " . $interpretPath . " --source=" . $path.".src" . " --input=" . $inFile, $intOut, $intRC);
-            $intOut = shell_exec("python3.8 " . $interpretPath . " --source=" . $path.".src" . " --input=" . $inFile);
+            exec("python3.8 " . $interpretPath . " --source=" . $path.".src" . " --input=" . $inFile . " 2>/dev/null", $intOut, $intRC);
+            $intOut = shell_exec("python3.8 " . $interpretPath . " --source=" . $path.".src" . " --input=" . $inFile . " 2>/dev/null");
         }
         
         if ($intRC != $rc){
