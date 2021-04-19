@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPP 2021 Výsledky testů</title>
+    <meta charset='utf-8' />
+    <style>
+        * {
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            background: whitesmoke;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, 'Noto Sans', sans-serif;
+        }
+
+        .summary-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding-top: 20px
+        }
+
+        .summary-table {
+            width: 400px;
+            height: 200px;
+            box-shadow: 10px 10px 50px -20px  rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+        }
+
+        .summary-header {
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .test-summary {
+            display: flex;
+            align-items: center;
+            height: 125px;
+            padding: 20px;
+            padding-left: 100px;
+            padding-top: 5px;
+            font-size: 20px;
+            font-weight: 400;
+            width: 100%;
+        }
+
+        .test-number{
+            padding-left: 60px;
+        }
+
+        .table-results {
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 20px;
+            width: 60%;
+        }
+
+        .table-results-container {
+            box-shadow: 10px 10px 50px -20px rgba(0, 0, 0, 0.4);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .test-result {
+            display: flex;
+            border-bottom: 1px solid rgba(81, 85, 90, 0.1);
+            padding: 10px;
+            align-items: center;
+        }
+
+        .test-result-order {
+            font-size: 25px;
+            width: 32px;
+            height: 32px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 25px;
+            margin-left: 25px;
+        }
+
+        .test-result-columns {
+            display: flex;
+            width: 100%;
+            align-items: center;
+        }
+
+        .test-result-columns div {
+            padding: 0px 5px;
+        }
+
+        .test-result-columns div:first-child {
+            width: 100%;
+        }
+
+        .test-result-columns table {
+            width: 70%;
+        }
+
+        .test-result-columns table tr th {
+            text-align: left;
+        }
+
+        .test-result-failed {
+            color: #cf2900;
+            padding-right: 20px;
+        }
+
+        .test-result-passed {
+            color: #02ba1e;
+            padding-right: 20px;
+        }
+
+        .test-dir{
+            width: 150px;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <section class='summary-container'>
+        <div class='summary-table'>
+            <h1 class='summary-header'>Výsledky testů</h1>
+            <div class='test-summary'>
+                <table>
+                    <tr>
+                        <td>Úspěšných:</td>
+                        <td class = 'test-number'>3</td>
+                    </tr>
+                    <tr>
+                        <td>Neúspěšných:</td>
+                        <td class = 'test-number'>0</td>
+                    </tr>
+                    <tr>
+                        <td>Celkem:</td>
+                        <td class = 'test-number'>3</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class='table-results'>
+        <div class='table-results-container'>
+            <div class='test-result'>
+                <div class='test-result-order'>1</div>
+                <div class='test-result-columns'>
+                    <div class='test-result-data'>
+                        <table>
+                            <tr>
+                                <th class = 'test-dir'>Složka:</th>
+                                <td>/tests/parse_only/Example_tests</td>
+                            </tr>
+                            <tr>
+                                <th>Název testu:</th>
+                                <td>read_test</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <h2 class='test-result-passed'>Úspěch</h2>
+                </div>
+            </div>
+
+            <div class='test-result'>
+                <div class='test-result-order'>2</div>
+                <div class='test-result-columns'>
+                    <div class='test-result-data'>
+                        <table>
+                            <tr>
+                                <th class = 'test-dir'>Složka:</th>
+                                <td>/tests/parse_only/Example_tests</td>
+                            </tr>
+                            <tr>
+                                <th>Název testu:</th>
+                                <td>read_test</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h2 class='test-result-failed'>Selhalo</h2>
+                </div>
+            </div>
+            <div class='test-result'>
+                <div class='test-result-order'>3317</div>
+                <div class='test-result-columns'>
+                    <div class='test-result-data'>
+                        <table>
+                            <tr>
+                                <th class = 'test-dir'>Složka:</th>
+                                <td>ipp-2020-tests-master/parse-only/GENERATED/read/simple25</td>
+                            </tr>
+                            <tr>
+                                <th>Název testu:</th>
+                                <td>simple25</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <h2 class='test-result-passed'>Úspěch</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
