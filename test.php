@@ -144,34 +144,34 @@
                 errorExit(11, "Couldn't open file\n");
             }
             fwrite($file, $parseOut);
-        }
         
-        # If argument parse-only is set compare output with jexamxml
-        if ($parseOnly){
-            if ($rc != $parseRc){
-                $testFailedCount++;
-                array_push($arrays, $path, "Failed");
-                return;
-            }
-            if ($parseRc == 0){
-                exec("java -jar " . $jexamxml ." ". $path .".tmp " . $outFile ." ". $path."delta.xml ". $jexamcfg, $trash, $xmlDiff);
-                unlink($path ."delta.xml");
-
-                if (!$xmlDiff){
-                    $testPassedCount++;
-                    array_push($arrays, $path, "Success");
-                }else {
+        
+            # If argument parse-only is set compare output with jexamxml
+            if ($parseOnly){
+                if ($rc != $parseRc){
                     $testFailedCount++;
                     array_push($arrays, $path, "Failed");
+                    return;
                 }
-                unlink($path .".tmp");
+                if ($parseRc == 0){
+                    exec("java -jar " . $jexamxml ." ". $path .".tmp " . $outFile ." ". $path."delta.xml ". $jexamcfg, $trash, $xmlDiff);
+                    unlink($path ."delta.xml");
+
+                    if (!$xmlDiff){
+                        $testPassedCount++;
+                        array_push($arrays, $path, "Success");
+                    }else {
+                        $testFailedCount++;
+                        array_push($arrays, $path, "Failed");
+                    }
+                    unlink($path .".tmp");
+                    return;
+                }
+                $testPassedCount++;
+                array_push($arrays, $path, "Success");
                 return;
             }
-            $testPassedCount++;
-            array_push($arrays, $path, "Success");
-            return;
         }
-
       
         # Choose which source file to give to interpret depending on set arguments
         if (!$intOnly){
