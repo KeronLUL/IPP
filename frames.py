@@ -51,15 +51,3 @@ class Frames:
             frameInsert[name]['type'] = type
         else: 
             ErrorHandler.errorExit(54, "Invalid variable")
-    
-    # Insert variable into given frame
-    def defvar(self, arg):
-        frame, name = arg['value'].split('@', 1)
-        frameInsert = self.getFrame(frame)
-        if frameInsert == 'UNDEFINED':
-            ErrorHandler.errorExit(55, "Invalid frame")
-        if name not in frameInsert:
-            frameInsert[name] = {'type': None, 'value': None}
-        else:
-            ErrorHandler.errorExit(52, "Semantic Error")
-            

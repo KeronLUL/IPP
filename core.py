@@ -119,17 +119,20 @@ class Interpret:
                 ErrorHandler.errorExit(11, "Couldn't open file")
         instruction = 0
         while instruction < len(self.instList):
-            try:
-                self.instList[instruction][1].opcode
-            except IndexError:
-                instruction += 1
             if self.instList[instruction][1].opcode == 'BREAK': 
                 print("Instruction order: " + str(self.instList[instruction][0]), file=sys.stderr)
                 print("Global frame: " + self.frames.globalFrame, file=sys.stderr)
                 print("Tmp frame: " + self.tmpFrame, file=sys.stderr)
                 print("Frame stack: " + self.frames.frameStack, file=sys.stderr)            
             elif self.instList[instruction][1].opcode == 'DEFVAR':
-                self.frames.defvar(self.instList[instruction][1].arg1)
+                frame, name = self.instList[instruction][1].arg1['value'].split('@', 1)
+                frameInsert = self.frames.getFrame(frame)
+                if frameInsert != 'UNDEFINED':
+                    if name not in frameInsert:
+                        frameInsert[name] = {'type': None, 'value': None}
+                    else:
+                        ErrorHandler.errorExit(52, "Semantic Error")
+                else: ErrorHandler.errorExit(55, "Invalid frame")
             elif self.instList[instruction][1].opcode == 'MOVE':
                 value, type = self.frames.getValueAndType(self.instList[instruction][1].arg2)
                 if value == 'nil':
