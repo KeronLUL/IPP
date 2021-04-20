@@ -10,7 +10,7 @@
 
     # Function that prints error and exits the program with value given by $val
     function errorExit($val, $string){
-        print($string);
+        fwrite(STDERR, $string);
         exit($val);
     }
 
