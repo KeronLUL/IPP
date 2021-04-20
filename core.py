@@ -1,8 +1,13 @@
+# IPP 2021
+# core.py
+# Author: Karel Norek, xnorek01
+
 import sys
 import re
 from frames import Frames
 from error import ErrorHandler
 
+# Class that interprets IPPcode21
 class Interpret:
     def __init__(self, list, labels):
         self.frames = Frames()

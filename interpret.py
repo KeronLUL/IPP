@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.8
 
+# IPP 2021
+# interpret.py
+# Author: Karel Norek, xnorek01
+
 import argparse
 import sys
 from xmlParser import XMLParser

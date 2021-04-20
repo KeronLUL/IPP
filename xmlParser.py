@@ -1,3 +1,7 @@
+# IPP 2021
+# xmlParser.py
+# Author: Karel Norek, xnorek01
+
 import xml.etree.ElementTree as ET
 import re
 import sys
@@ -15,7 +19,7 @@ class Instruction:
         if arg3 is not None:
             self.arg3 = {'type': arg3.attrib['type'], 'value': arg3.text}
 
-
+# Class that parser XML file xiven by argument xmlFile
 class XMLParser:
     def __init__(self, xmlFile):
         self.instructions = {
@@ -77,6 +81,7 @@ class XMLParser:
         order = []
         instList = {}
         labels = {}
+        # Check all instructions in XML file and insert them into instList
         for inst in self.root:
             if inst.tag != 'instruction':
                 ErrorHandler.errorExit(32, "Invalid XML structure") 
@@ -93,6 +98,7 @@ class XMLParser:
             args = len(self.instructions[inst.attrib['opcode']])
             
             counter = 1
+            # Check arguments of instructions
             for arg in inst:
                 if counter > args:
                     ErrorHandler.errorExit(32, "Invalid XML structure")
@@ -118,6 +124,7 @@ class XMLParser:
             elif args == 1:
                 instruction = Instruction(inst.attrib['opcode'], arg1=inst[0])
                 instList[int(inst.attrib['order'])] = instruction
+                # If instruction is label, insert name of label into labels dict
                 if inst.attrib['opcode'] == 'LABEL':
                     label = inst[0].text
                     if label in labels:

@@ -1,7 +1,12 @@
+# IPP 2021
+# frames.py
+# Author: Karel Norek, xnorek01
+
 import re
 import sys
 from error import ErrorHandler
 
+# Class for work with frames
 class Frames:
     def __init__(self):
         self.globalFrame = {}
@@ -9,6 +14,7 @@ class Frames:
         self.tmpFrame = None
         self.type = False 
 
+    # Create temporary frame
     def createTmpFrame(self):
         self.tmpFrame = {}
 
@@ -28,6 +34,7 @@ class Frames:
             else: ErrorHandler.errorExit(54, "Invalid variable")
         else: return arg['value'], arg['type']
 
+    # Check if desired frame exists and return it
     def getFrame(self, frame):
         if frame == 'GF':
             return self.globalFrame
